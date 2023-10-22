@@ -5,6 +5,7 @@ import Footer from "../components/Footer";
 import EventSection from "../components/EventSection";
 import Tshirt from "../components/Tshirt";
 import Sponsars from "../components/Sponsars";
+
 function Home() {
   return (
     <>

@@ -8,6 +8,7 @@ import EventData from './data/EventData';
 import About from './pages/About';
 import SmTeam from './pages/SmTeam';
 import Gallery from './pages/Gallery';
+import Register from './pages/Register';
 
 function App() {
   return (
@@ -20,6 +21,7 @@ function App() {
         <Route path="/about" element={<About />} />
         <Route path='/team' element={<SmTeam />} />
         <Route path="/gallery" element={<Gallery />} />
+        <Route path='/register' element={<Register />} />
       </Routes>
     </BrowserRouter>
   );

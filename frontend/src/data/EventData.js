@@ -28,7 +28,29 @@ const EventData = [
                     "Qui laudantium consequatur laborum sit qui ad sapiente dila parde sonata raqer a videna mareta paulona marka",
                     "Qui laudantium consequatur laborum sit qui ad sapiente dila parde sonata raqer a videna mareta paulona marka",
                 ],
-            }
+            },
+            {
+                tabId: "3",
+                heading: "Evaluation Criteria",
+                data: [
+                    "The evaluation will be based on the following criteria:",
+                    "1. Creativity",
+                    "2. Originality",
+                    "3. Relevance to the theme",
+                    "4. Overall presentation",
+                ],
+            },
+            {
+                tabId: "4",
+                heading: "Prizes",
+                data: [
+                    "The top 3 winners will be awarded cash prizes and certificates.",
+                    "1st Prize: ₹3000",
+                    "2nd Prize: ₹2000",
+                    "3rd Prize: ₹1000",
+                ],
+            },
+            
         ],
     }
 ];

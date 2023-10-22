@@ -1,4 +1,5 @@
 import React from "react";
+import axios from "axios";
 
 function Navbar(page) {
   const home = page.page === "home" ? " active" : "";
@@ -6,6 +7,24 @@ function Navbar(page) {
   const gallery = page.page === "gallery" ? " active" : "";
   const team = page.page === "team" ? " active" : "";
 
+  // const user = axios
+  //   .get("http://localhost:5000/user", {
+  //     headers: {
+  //       "token": localStorage.getItem("token"),
+  //     },
+
+  //   })
+  //   .then((res) => {
+  //     console.log(res);
+  //   })
+  //   .catch((err) => {
+  //     console.log(err);
+  //   });
+
+  function logout() {
+    localStorage.removeItem("token");
+    window.location.href = "/";
+  }
 
   return (
     <>
@@ -23,7 +42,7 @@ function Navbar(page) {
         </button>
         <div class="collapse navbar-collapse" id="navbarCollapse">
           <div class="navbar-nav ml-auto py-0">
-            <a href="/" class={"nav-item nav-link"+ home}>
+            <a href="/" class={"nav-item nav-link" + home}>
               Home
             </a>
             <a href="/about" class={"nav-item nav-link" + about}>
@@ -36,12 +55,21 @@ function Navbar(page) {
               Our Team
             </a>
           </div>
-          <a
-            href=""
-            class="btn btn-primary-gradient rounded-pill py-2 px-4 ms-3 d-none d-lg-block"
-          >
-            Register
-          </a>
+          {localStorage.getItem("token") ? (
+            <a
+              onClick={logout}
+              class="btn btn-primary-gradient rounded-pill py-2 px-4"
+            >
+              Logout
+            </a>
+          ) : (
+            <a
+              href="/register"
+              class="btn btn-primary-gradient rounded-pill py-2 px-4"
+            >
+              Register
+            </a>
+          )}
         </div>
       </nav>
     </>

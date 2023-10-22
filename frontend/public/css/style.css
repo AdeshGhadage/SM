@@ -642,6 +642,15 @@ h6,
     width: 85px; height: 85px;
   }
 
-  .image-gallery-custom-left-nav{
-    
+  .message{
+    font-size: 2rem;
+    font-weight: 600;
   }
+
+  .green{
+    color: green;
+  }
+
+    .red{
+        color: red;
+    }
