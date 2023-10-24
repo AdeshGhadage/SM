@@ -2,6 +2,9 @@ const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
 const cookieParser = require("cookie-parser");
+const Razorpay = require("razorpay");
+const shortid = require("shortid");
+const crypto = require("crypto");
 require("dotenv").config();
 
 const app = express();
@@ -37,6 +40,9 @@ const jwt = require("jsonwebtoken");
 
 //importing schema
 const Registration = require("./Schema/user");
+
+const Event = require("./Schema/eventSchema");
+const { Console } = require("console");
 
 //cors
 app.use(cors());
@@ -100,11 +106,12 @@ app.post("/login", async (req, res) => {
       const password_match = await bcrypt.compare(password, user.password);
       if (password_match) {
         const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET);
-        await Registration.updateOne({ sm_id: sm_id }, { $set: { token: token } });
+        await Registration.updateOne(
+          { sm_id: sm_id },
+          { $set: { token: token } }
+        );
         console.log(token);
-        res.json({ token: token,
-          message: "login successful",
-         });
+        res.json({ token: token, message: "login successful" });
       }
     } else {
       res.send("invalid credentials");
@@ -115,41 +122,124 @@ app.post("/login", async (req, res) => {
   }
 });
 
+//get user data by localstroge sm_id and token
 
-//logout using jwt clear cookie
-app.post("/logout", async (req, res) => {
-  try{
-    const user = await Registration.findOne({ token: req.cookies.token });
-    if(user){
-      await Registration.updateOne({ token: req.cookies.token }, { $set: { token: "" } });
-      res.clearCookie("token");
-      res.send("logout successful");
-    }else{
-      res.send("user not logged in");
-    }
-  }
-  catch(error){
-    res.send("something went wrong");
-    console.log(error);
-  }
-});
-
-//get user data if local storage has vaild token
 app.get("/user", async (req, res) => {
-  try{
-    const user = await Registration.findOne({ token: req.body.token });
-    if(user){
-      res.send(user);
-    }else{
-      res.send("user not logged in");
-    }
-  }
-  catch(error){
+  try {
+    const token = req.headers.token;
+    console.log(token);
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const user = await Registration.findOne({ _id: decoded.id });
+    const data = {
+      name: user.name,
+      email: user.email,
+      sm_id: user.sm_id,
+      college: user.college,
+      contact: user.contact,
+    };
+    res.send(data);
+  } catch (error) {
     res.send("something went wrong");
     console.log(error);
   }
 });
 
+//razorpay payment gateway for capturethewater event
+const razorpay = new Razorpay({
+  key_id: process.env.RAZORPAY_KEY_ID,
+  key_secret: process.env.RAZORPAY_KEY_SECRET,
+});
+
+//razorpay payment gateway for capturethewater event
+
+app.post("/razorpay/capturethewater", async (req, res) => {
+  const token = req.body.token;
+  console.log(token);
+  const decoded = jwt.verify(token, process.env.JWT_SECRET);
+  const user = await Registration.findOne({ _id: decoded.id });
+  console.log(user);
+
+  const amount = 100;
+  const options = {
+    amount: (amount * 100).toString(),
+    currency: "INR",
+    receipt: shortid.generate(),
+  };
+  try {
+    const response = await razorpay.orders.create(options);
+    //update order id in user database
+    await Registration.updateOne(
+      { _id: decoded.id },
+      { $set: { orderId: response.id } }
+    )
+      .then((result) => {
+        console.log(result);
+      })
+    console.log("order id updated in user database");
+    res.json({
+      id: response.id,
+      currency: response.currency,
+      amount: response.amount,
+      name: user?.name,
+      email: user?.email,
+      contact: user?.contact,
+      sm_id: user?.sm_id,
+    });
+  } catch (error) {
+    console.log(error);
+  }
+});
+
+// Handle the Razorpay webhook endpoint
+app.post("/success/capturethewater", async (req, res) => {
+  const body = req.body;
+  const { razorpay_payment_id, razorpay_order_id, razorpay_signature } = body;
+
+  // Verify the signature
+  const generatedSignature = crypto
+    .createHmac("sha256", process.env.RAZORPAY_KEY_SECRET)
+    .update(razorpay_order_id + "|" + razorpay_payment_id)
+    .digest("hex");
+
+  console.log(generatedSignature, razorpay_signature);
+  if (generatedSignature === razorpay_signature) {
+    // Signature is valid. Fetch user details based on the order ID or any identifier.
+    const user = await Registration.findOne({ orderId: razorpay_order_id });
+    if (user) {
+      // Store the user details in the event collection
+      const event = new Event({
+        name: user.name,
+        email: user.email,
+        sm_id: user.sm_id,
+        college: user.college,
+        contact: user.contact,
+        event: "capturethewater",
+        orderId: razorpay_order_id,
+        paymentId: razorpay_payment_id,
+        teammembers: [],
+        created_at: Date.now(),
+      });
+      event
+        .save()
+        .then((result) => {
+          console.log(result);
+          res.status(200).send("Payment successful");
+        })
+        .catch((err) => {
+          console.log(err);
+          res.status(400).send("Payment failed");
+        });
+
+      // Insert or update user details in MongoDB here.
+    } else {
+      // User not found
+      res.status(400).send("User not found for the given order ID.");
+    }
+  } else {
+    // Invalid webhook, do not process.
+    res.status(400).send("Invalid webhook signature.");
+  }
+});
 
 app.listen(process.env.PORT, () => {
   console.log("Server is running on port " + process.env.PORT);

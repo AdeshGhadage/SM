@@ -23,6 +23,7 @@ export default function Login() {
           console.log(res);
           if (res.data.message === "login successful") {
             localStorage.setItem("token", res.data.token);
+            localStorage.setItem("smid", smid);
             alert("Login Successful");
             window.location.href = "/";
           } else {

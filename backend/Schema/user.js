@@ -9,6 +9,7 @@ const userSchema = new mongoose.Schema({
     created_at: { type: Date, default: Date.now },
     token : String,
     resetToken: String,
+    orderId: String,
 });
 
 

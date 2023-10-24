@@ -7,22 +7,10 @@ function Navbar(page) {
   const gallery = page.page === "gallery" ? " active" : "";
   const team = page.page === "team" ? " active" : "";
 
-  // const user = axios
-  //   .get("http://localhost:5000/user", {
-  //     headers: {
-  //       "token": localStorage.getItem("token"),
-  //     },
-
-  //   })
-  //   .then((res) => {
-  //     console.log(res);
-  //   })
-  //   .catch((err) => {
-  //     console.log(err);
-  //   });
 
   function logout() {
     localStorage.removeItem("token");
+    localStorage.removeItem("smid");
     window.location.href = "/";
   }
 
@@ -58,14 +46,14 @@ function Navbar(page) {
           {localStorage.getItem("token") ? (
             <a
               onClick={logout}
-              class="btn btn-primary-gradient rounded-pill py-2 px-4"
+              class="btn btn-primary-gradient rounded-pill py-2 px-4 navbar-nav"
             >
               Logout
             </a>
           ) : (
             <a
               href="/register"
-              class="btn btn-primary-gradient rounded-pill py-2 px-4"
+              class="btn btn-primary-gradient rounded-pill py-2 px-4 navbar-nav"
             >
               Register
             </a>
