@@ -1,5 +1,4 @@
 import React from "react";
-import axios from "axios";
 
 function Navbar(page) {
   const home = page.page === "home" ? " active" : "";

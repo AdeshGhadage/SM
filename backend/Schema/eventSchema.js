@@ -7,8 +7,8 @@ const eventSchema = new mongoose.Schema({
     contact: { type: String, required: true },
     event: { type: String, required: true },
     orderId: { type: String, required: true },
-    paymentId: { type: String, required: true },
-    teammembers: { type: Array, required: true },
+    paymentId: { type: String },
+    teammembers: { type: Array},
     created_at: { type: Date, default: Date.now },
 });
 module.exports = mongoose.model('Event', eventSchema);

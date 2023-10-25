@@ -10,6 +10,7 @@
     "jquery": "^3.7.1",
     "owl.carousel": "^2.3.4",
     "react": "^18.2.0",
+    "react-bootstrap": "^2.9.1",
     "react-dom": "^18.2.0",
     "react-image-gallery": "^1.3.0",
     "react-owl-carousel": "^2.3.3",

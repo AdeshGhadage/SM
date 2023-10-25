@@ -1,70 +1,35 @@
 import React from "react";
 import EventData from "../data/EventData";
 import axios from "axios";
-
-function loadscript(src) {
-  return new Promise((resolve) => {
-    const script = document.createElement("script");
-    script.src = src;
-    document.body.appendChild(script);
-    script.onload = () => {
-      resolve(true);
-    };
-    script.onerror = () => {
-      resolve(false);
-    };
-    document.body.appendChild(script);
-  });
-}
+import MyVerticallyCenteredModal from "./DetailsModel";
 
 function EventDetail(link) {
   const event = EventData.find(({ link }) => link === link);
-  console.log("this is my link");
-  console.log(event);
-  let myclass = "tab-pane active";
+  const [modalShow, setModalShow] = React.useState(false);
+  const [user, setUser] = React.useState({});
+  
 
-  async function displayRazorpay() {
-    const res = await loadscript(
-      "https://checkout.razorpay.com/v1/checkout.js"
-    );
-
-    if (!res) {
-      alert("Razorpay SDK failed to load. Are you online?");
-      return;
-    }
-
+  async function details() {
     const data = await axios
       .post("http://localhost:5000/razorpay" + event.link, {
         token: localStorage.getItem("token"),
       })
       .then((t) => t.data);
+    
 
-    const options = {
-      key: "rzp_test_tzyr3bXBeGsUoZ", // Enter the Key ID generated from the Dashboard
-      amount: data.amount, // Amount is in currency subunits. Default currency is INR. Hence, 50000 refers to 50000 paise
+    //set user and add link to data
+    setUser({
+      name: data.name,
+      email: data.email,
+      contact: data.contact,
+      link: event.link,
+      id: data.id,
+      sm_id: data.sm_id,
       currency: data.currency,
-      order_id: data.id, //This is a sample Order ID. Pass the `id` obtained in the response of Step 1
-      name: "Capature the water Registeration", //your business name
-      description: "Test Transaction",
-      image: "img/logo.png",
-      callback_url: "http://localhost:5000/success" + event.link,
-      prefill: {
-        //We recommend using the prefill parameter to auto-fill customer's contact information especially their phone number
-        name: data.name,
-        email: data.email,
-        contact: data.contact,
-      },
-      notes: {
-        address: "Razorpay Corporate Office",
-      },
-      theme: {
-        color: "#3399cc",
-      },
-    };
-    console.log(options);
-
-    const paymentObject = new window.Razorpay(options);
-    paymentObject.open();
+      teamSize : data.teamSize,
+    });
+    
+    setModalShow(true);
   }
 
   return (
@@ -105,12 +70,12 @@ function EventDetail(link) {
               <div class="course-info d-flex justify-content-between align-items-center mb-2">
                 <h5>Schedule</h5>
                 <p>
-                <a
-                  href={event.brochure}
-                  class="btn btn-secondary-gradient rounded-pill py-2 px-4"
-                >
-                  Info Brochure
-                </a>
+                  <a
+                    href={event.brochure}
+                    class="btn btn-secondary-gradient rounded-pill py-2 px-4"
+                  >
+                    Info Brochure
+                  </a>
                 </p>
               </div>
 
@@ -132,11 +97,16 @@ function EventDetail(link) {
                   <p>
                     <a
                       class="btn btn-secondary-gradient rounded-pill py-2 px-4"
-                      onClick={displayRazorpay}
+                      onClick={details}
                     >
                       Register Now
                     </a>
                   </p>
+                  <MyVerticallyCenteredModal
+                    show={modalShow}
+                    onHide={() => setModalShow(false)}
+                    user={user}
+                  />
                 </div>
               ) : (
                 <div class="course-info d-flex justify-content-between align-items-center mb-2">

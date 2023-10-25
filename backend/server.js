@@ -184,6 +184,7 @@ app.post("/razorpay/capturethewater", async (req, res) => {
       email: user?.email,
       contact: user?.contact,
       sm_id: user?.sm_id,
+      teamSize: 4,
     });
   } catch (error) {
     console.log(error);
@@ -194,7 +195,6 @@ app.post("/razorpay/capturethewater", async (req, res) => {
 app.post("/success/capturethewater", async (req, res) => {
   const body = req.body;
   const { razorpay_payment_id, razorpay_order_id, razorpay_signature } = body;
-
   // Verify the signature
   const generatedSignature = crypto
     .createHmac("sha256", process.env.RAZORPAY_KEY_SECRET)
@@ -204,33 +204,12 @@ app.post("/success/capturethewater", async (req, res) => {
   console.log(generatedSignature, razorpay_signature);
   if (generatedSignature === razorpay_signature) {
     // Signature is valid. Fetch user details based on the order ID or any identifier.
-    const user = await Registration.findOne({ orderId: razorpay_order_id });
-    if (user) {
+    const event = await Event.findOne({ orderId: razorpay_order_id });
+    if (event) {
       // Store the user details in the event collection
-      const event = new Event({
-        name: user.name,
-        email: user.email,
-        sm_id: user.sm_id,
-        college: user.college,
-        contact: user.contact,
-        event: "capturethewater",
-        orderId: razorpay_order_id,
-        paymentId: razorpay_payment_id,
-        teammembers: [],
-        created_at: Date.now(),
-      });
-      event
-        .save()
-        .then((result) => {
-          console.log(result);
-          res.status(200).send("Payment successful");
-        })
-        .catch((err) => {
-          console.log(err);
-          res.status(400).send("Payment failed");
-        });
-
-      // Insert or update user details in MongoDB here.
+      event.paymentId = razorpay_payment_id;
+      event.save();
+      res.send("Payment successful");
     } else {
       // User not found
       res.status(400).send("User not found for the given order ID.");
@@ -239,6 +218,48 @@ app.post("/success/capturethewater", async (req, res) => {
     // Invalid webhook, do not process.
     res.status(400).send("Invalid webhook signature.");
   }
+});
+
+//register in event
+// name: data.name,
+//       email: data.email,
+//       contact: data.contact,
+//       link: event.link,
+//       id: data.id,
+//       sm_id: data.sm_id,
+//       currency: data.currency,
+//       teamSize : data.teamSize,
+
+app.post("/register/event", async (req, res) => {
+  const token = req.body.token;
+  const decoded = jwt.verify(token, process.env.JWT_SECRET);
+  const user = await Registration.findOne({ _id: decoded.id });
+  console.log("user : ")
+  console.log(user);
+  const data = req.body;
+  console.log("data : ")
+  console.log(data);
+  const event = new Event({
+    name: user.name,
+    email: user.email,
+    sm_id: user.sm_id,
+    college: user.college,
+    contact: user.contact,
+    event: data.event,
+    orderId: data.orderId,
+    teammembers: data.teammembers,
+    created_at: Date.now(),
+  });
+  event
+    .save()
+    .then((result) => {
+      console.log(result);
+      res.status(200).send("added to event");
+    })
+    .catch((err) => {
+      console.log(err);
+      res.status(400).send("failed to add in event");
+    });
 });
 
 app.listen(process.env.PORT, () => {
