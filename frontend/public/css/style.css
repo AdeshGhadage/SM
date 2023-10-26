@@ -654,3 +654,24 @@ h6,
     .red{
         color: red;
     }
+
+
+/*Schedule Sections starts*/
+.schedule_buttons{
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: space-evenly;
+}
+
+.schedule_button{
+    background: linear-gradient(to bottom right, #4294E3, #8F12FD);
+    color: white;
+    transition: all 0.3s ease-in-out;
+}
+
+.schedule_button.active, .schedule_button:hover{
+    background: #8F12FD;
+    color: white;
+    scale: 1.1;
+}
