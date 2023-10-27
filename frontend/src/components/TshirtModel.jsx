@@ -2,6 +2,8 @@ import React from "react";
 import { Button, Modal, Form } from "react-bootstrap";
 import axios from "axios";
 
+const sizeOptions = ["Small", "Medium", "Large", "XL", "XXL"];
+
 function loadscript(src) {
   return new Promise((resolve) => {
     const script = document.createElement("script");
@@ -17,43 +19,31 @@ function loadscript(src) {
   });
 }
 
-function MyVerticallyCenteredModal(props) {
-  // console.log(props.user);
-  //make a list of numbers from 1 to teamsize
-  const numbers = [];
-  for (let i = 1; i <= props.user.teamSize; i++) {
-    numbers.push(i);
-  }
-
-  var sm_id = [];
-
-  function registerToevent() {
+function TshirtModal(props) {
+  console.log(props.user);
+  function registerToTshirt() {
     const data = {
       token: localStorage.getItem("token"),
-      event: props.user.link,
       orderId: props.user.id,
-      teammembers: sm_id,
+      size: props.user.size,
     };
-
     axios
-      .post("http://localhost:5000/register/event", data)
+      .post("http://localhost:5000/tshirt", data)
       .then((res) => {
-        console.log("You have successfully added to the event");
+        console.log("You have successfully added to the tshirt");
       })
       .catch((err) => console.log(err));
   }
 
   async function displayRazorpay(data) {
-    registerToevent();
+    registerToTshirt();
     const res = await loadscript(
       "https://checkout.razorpay.com/v1/checkout.js"
     );
-
     if (!res) {
       alert("Razorpay SDK failed to load. Are you online?");
       return;
     }
-
     const options = {
       key: "rzp_test_tzyr3bXBeGsUoZ", // Enter the Key ID generated from the Dashboard
       amount: data.amount, // Amount is in currency subunits. Default currency is INR. Hence, 50000 refers to 50000 paise
@@ -62,7 +52,7 @@ function MyVerticallyCenteredModal(props) {
       name: "Capature the water Registeration", //your business name
       description: "Test Transaction",
       image: "img/logo.png",
-      callback_url: "http://localhost:5000/success" + data.link,
+      callback_url: "http://localhost:5000/success/tshirt",
       prefill: {
         //We recommend using the prefill parameter to auto-fill customer's contact information especially their phone number
         name: data.name,
@@ -87,62 +77,53 @@ function MyVerticallyCenteredModal(props) {
       aria-labelledby="contained-modal-title-vcenter"
       centered
     >
-      <Modal.Header closeButton className="container-xxl bg-secondary-gradient">
-        <Modal.Title
-          id="contained-modal-title-vcenter"
-          className="navbar-brand p-0 white"
-        >
-          Please confirm your details
-        </Modal.Title>
+      <Modal.Header closeButton>
+        <Modal.Title id="contained-modal-title-vcenter">Tshirt</Modal.Title>
       </Modal.Header>
-      <Modal.Body className="container py-5 px-lg-5">
+      <Modal.Body>
         <div class="text-center">
           <h5 class="text-primary-gradient fw-medium">Samudramanthan</h5>
           <h1 class="mb-5">Hellow {props.user.name}</h1>
           <p>Email : {props.user.email}</p>
           <p>contact number : {props.user.contact}</p>
-          <p>SM id - captian : {props.user.sm_id}</p>
+          <p>SM id : {props.user.sm_id}</p>
           <p>Order id : {props.user.id}</p>
-          <p>Fees : {props.user.amount/100}</p>
-          <p
-            style={{
-              color: "red",
-            }}
-          >
-            Please put SmId of your teammates correctly
-          </p>
+          <p>Fees : {props.user.amount / 100}</p>
         </div>
-
-        {props.user.teamSize ? (
-          <Form>
-            {numbers.map((number) => (
-              <>
-                <Form.Group
-                  className="mb-3"
-                  controlId="exampleForm.ControlInput1"
-                >
-                  <Form.Label>Teammate {number}</Form.Label>
-                  <Form.Control
-                    type="text"
-                    className="form-control"
-                    placeholder="sm id"
-                    onChange={(e) => {
-                      sm_id[number - 1] = e.target.value;
-                    }}
-                  />
-                </Form.Group>
-              </>
-            ))}
-          </Form>
-        ) : null}
+        <Form>
+          <Form.Group className="mb-3" controlId="formSizeSelect">
+            <Form.Label>Size</Form.Label>
+            <Form.Control
+              as="select"
+              placeholder="Enter Size"
+              onChange={(e) => {
+                props.setUser({
+                  ...props.user,
+                  size: e.target.value,
+                });
+              }}
+            >
+              {sizeOptions.map((size, index) => (
+                <option key={index} value={size}>
+                  {size}
+                </option>
+              ))}
+            </Form.Control>
+          </Form.Group>
+        </Form>
       </Modal.Body>
       <Modal.Footer>
-        <Button onClick={() => displayRazorpay(props.user)}>Ok</Button>
+        <Button
+          onClick={() => {
+            displayRazorpay(props.user);
+          }}
+        >
+          Pay
+        </Button>
         <Button onClick={props.onHide}>Close</Button>
       </Modal.Footer>
     </Modal>
   );
 }
 
-
-export default MyVerticallyCenteredModal;
+export default TshirtModal;

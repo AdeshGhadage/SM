@@ -16,10 +16,7 @@ function Footer() {
                 Technology Kharagpur Kharagpur, West Bengal 721302 India
               </p>
               <p>
-                <i class="fa fa-phone-alt me-3"></i>9307403993 
-              </p>
-              <p>
-                <i class="fa fa-phone-alt me-3"></i>9325000320
+                <i class="fa fa-phone-alt me-3"></i>9307403993 / 9325000320 (web Heads)
               </p>
               <p>
                 <i class="fa fa-envelope me-3"></i>

@@ -9,6 +9,7 @@ import About from './pages/About';
 import SmTeam from './pages/SmTeam';
 import Gallery from './pages/Gallery';
 import Register from './pages/Register';
+import Cap from './pages/Cap';
 import Schedule from './pages/Schedule';
 
 function App() {
@@ -17,13 +18,14 @@ function App() {
       <Routes>
         <Route path="/" element={<Home />} />
         {EventData.map((event) => (
-          <Route path={`${event.link}`} element={<Event event={event} />} />
+          <Route path={event.link} element={<Event event={event} />} />
         ))}
         <Route path="/about" element={<About />} />
         <Route path='/team' element={<SmTeam />} />
         <Route path="/gallery" element={<Gallery />} />
         <Route path='/register' element={<Register />} />
-        <Route path='/schedule' element={<Schedule />}/>
+        <Route path='/cap' element={<Cap />} />
+        <Route path='/schedule' element={<Schedule />} />
       </Routes>
     </BrowserRouter>
   );

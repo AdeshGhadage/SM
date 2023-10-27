@@ -21,18 +21,18 @@ export default function Register() {
                     <ul
                         class="nav nav-pills d-inline-flex justify-content-center bg-primary-gradient rounded-pill mb-5">
                         <li class="nav-item">
-                            <button class="nav-link active" data-bs-toggle="pill" href="#tab-1">Register</button>
+                            <button class="nav-link active" data-bs-toggle="pill" href="#tab-1">Login</button>
                         </li>
                         <li class="nav-item">
-                            <button class="nav-link" data-bs-toggle="pill" href="#tab-2">Login</button>
+                            <button class="nav-link" data-bs-toggle="pill" href="#tab-2">Register</button>
                         </li>
                     </ul>
                     <div class="tab-content text-start">
                         <div id="tab-1" class="tab-pane fade show p-0 active">
-                            < RegisterSection />
+                            < Login />
                         </div>
                         <div id="tab-2" class="tab-pane fade p-0">
-                            <Login />
+                            <RegisterSection />
                         </div>
                     </div>
                 </div>

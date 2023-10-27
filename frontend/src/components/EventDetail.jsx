@@ -7,7 +7,20 @@ function EventDetail(link) {
   const event = EventData.find(({ link }) => link === link);
   const [modalShow, setModalShow] = React.useState(false);
   const [user, setUser] = React.useState({});
-  
+  const [isRegistered, setIsRegistered] = React.useState(false);
+
+  if (localStorage.getItem("token")) {
+
+    async function check() {
+      const data = await axios
+        .post("http://localhost:5000/event/isregistered", {
+          token: localStorage.getItem("token"),
+          link: event.link,
+        })
+        .then((t) => setIsRegistered(t.data));
+    }
+    check();
+  }
 
   async function details() {
     const data = await axios
@@ -15,7 +28,6 @@ function EventDetail(link) {
         token: localStorage.getItem("token"),
       })
       .then((t) => t.data);
-    
 
     //set user and add link to data
     setUser({
@@ -25,10 +37,11 @@ function EventDetail(link) {
       link: event.link,
       id: data.id,
       sm_id: data.sm_id,
+      amount: data.amount,
       currency: data.currency,
-      teamSize : data.teamSize,
+      teamSize: data.teamSize,
     });
-    
+
     setModalShow(true);
   }
 
@@ -94,14 +107,22 @@ function EventDetail(link) {
               {localStorage.getItem("token") ? (
                 <div class="course-info d-flex justify-content-between align-items-center mb-2">
                   <h5>Register Event</h5>
-                  <p>
-                    <a
-                      class="btn btn-secondary-gradient rounded-pill py-2 px-4"
-                      onClick={details}
-                    >
-                      Register Now
-                    </a>
-                  </p>
+                  {isRegistered ? (
+                    <p>
+                      <a class="btn btn-green-gredient rounded-pill py-2 px-4">
+                        already registered
+                      </a>
+                    </p>
+                  ) : (
+                    <p>
+                      <a
+                        class="btn btn-secondary-gradient rounded-pill py-2 px-4"
+                        onClick={details}
+                      >
+                        Register Now
+                      </a>
+                    </p>
+                  )}
                   <MyVerticallyCenteredModal
                     show={modalShow}
                     onHide={() => setModalShow(false)}

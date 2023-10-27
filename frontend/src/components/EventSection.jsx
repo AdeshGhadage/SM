@@ -1,10 +1,7 @@
 import React from "react";
-import { Outlet, Link } from "react-router-dom";
 import Events from "../data/EventShort";
 
 function EventSection() {
-
-    
 
     return(
         <div class="container-xxl py-5" id="feature">

@@ -5,6 +5,8 @@ function Navbar(page) {
   const about = page.page === "about" ? " active" : "";
   const gallery = page.page === "gallery" ? " active" : "";
   const team = page.page === "team" ? " active" : "";
+  const cap = page.page === "cap" ? " active" : "";
+  const schedule = page.page === "schedule" ? " active" : "";
 
 
   function logout() {
@@ -16,7 +18,7 @@ function Navbar(page) {
   return (
     <>
       <nav class="navbar sticky-top shadow-sm navbar-expand-lg navbar-light px-4 px-lg-5 py-3 py-lg-0">
-        <a href="" class="navbar-brand p-0">
+        <a href="/" class="navbar-brand p-0">
           <h1 class="m-0">Samudramanthan</h1>
         </a>
         <button
@@ -41,11 +43,17 @@ function Navbar(page) {
             <a href="/team" class={"nav-item nav-link" + team}>
               Our Team
             </a>
+            <a href="/cap" class={"nav-item nav-link" + cap}>
+              CAP
+            </a>
+            <a href="/schedule" class={"nav-item nav-link" + schedule}>
+              Schedule
+            </a>
           </div>
           {localStorage.getItem("token") ? (
             <a
               onClick={logout}
-              class="btn btn-primary-gradient rounded-pill py-2 px-4 navbar-nav"
+              class="btn btn-green-gredient rounded-pill py-2 px-4 navbar-nav"
             >
               Logout
             </a>
@@ -54,7 +62,7 @@ function Navbar(page) {
               href="/register"
               class="btn btn-primary-gradient rounded-pill py-2 px-4 navbar-nav"
             >
-              Register
+              login
             </a>
           )}
         </div>

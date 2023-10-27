@@ -655,6 +655,15 @@ h6,
         color: red;
     }
 
+.white{
+    color: white;
+}
+
+.btn-green-gredient{
+    /* background: linear-gradient(to bottom right, var(#62FC3B), var(#034801)); */
+    background: linear-gradient(to bottom right, #077f03, #34a618);
+    color: white;
+}
 
 /*Schedule Sections starts*/
 .schedule_buttons{
@@ -665,13 +674,19 @@ h6,
 }
 
 .schedule_button{
-    background: linear-gradient(to bottom right, #4294E3, #8F12FD);
+    background: linear-gradient(to bottom right, var(--primary), var(--secondary));
     color: white;
     transition: all 0.3s ease-in-out;
 }
 
-.schedule_button.active, .schedule_button:hover{
-    background: #8F12FD;
+.schedule_button:hover{
+    background: linear-gradient(to bottom right, var(--secondary), var(--primary));
     color: white;
+    scale: 1.1;
+}
+
+.schedule_button.active{
+    background: var(--light) ;
+    color: var(--dark);
     scale: 1.1;
 }
