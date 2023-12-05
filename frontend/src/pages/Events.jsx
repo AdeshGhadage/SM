@@ -1,17 +1,16 @@
 import React from "react";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
-import EventDetail from "../components/EventDetail";
+import EventSection from "../components/EventSection";
 
-function Event({event}){
-    console.log(event)
+function Events(){
     return(
         <>
         <div class="container-xxl bg-white p-0">
         <div class="container-xxl position-relative p-0" id="home">
-          <Navbar />
+          <Navbar page="events"/>
         </div>
-        <EventDetail link={event.link} />
+        <EventSection></EventSection>
         <Footer />
         
       </div>
@@ -19,4 +18,4 @@ function Event({event}){
     );
 }
 
-export default Event;
+export default Events;

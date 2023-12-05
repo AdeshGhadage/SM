@@ -1,52 +1,60 @@
-const Events= [
-    {
-        name: "Boat Race",
-        link: "/boatrace",
-        poster: "img/event/event1.png",
-        description: "This event will put your talents to the test across various disciplines as you must produce a CAD model, a GA, documentation, and finally present it, which will then be judged according to the weightage shown below, followed by wonderful cash rewards."
-    },
-    {
-        name: "AquaMOD",
-        link: "/aquamod",
-        poster: "img/event/event1.png",
-        description: "This event will put your talents to the test across various disciplines as you must produce a CAD model, a GA, documentation, and finally present it, which will then be judged according to the weightage shown below, followed by wonderful cash rewards."
-    },
-    {
-        name: "Paper Prep",
-        link: "/paperprep",
-        poster: "img/event/event1.png",
-        description: " In an ever-changing world, the challenges of daily life are progressively intensifying. Each passing day brings forth greater difficulties, making it imperative to discover effective solutions and inspire fresh ideas to overcome these obstacles."
-    },
-    {
-        name: "WaveQuest- Case Study",
-        link: "/wavequest",
-        poster: "img/event/event1.png",
-        description: "In an ever-changing world, the challenges of daily life are progressively intensifying. Each passing day brings forth greater difficulties, making it imperative to discover effective solutions and inspire fresh ideas to overcome these obstacles."
-    },
-    {
-        name: "Debate",
-        link: "/debate",
-        poster: "img/event/event1.png",
-        description: "In an ever-changing world, the challenges of daily life are progressively intensifying. Each passing day brings forth greater difficulties, making it imperative to discover effective solutions and inspire fresh ideas to overcome these obstacles."
-    },
-    {
-        name: "Quiz",
-        link: "/quiz",
-        poster: "img/event/event1.png",
-        description: "In an ever-changing world, the challenges of daily life are progressively intensifying. Each passing day brings forth greater difficulties, making it imperative to discover effective solutions and inspire fresh ideas to overcome these obstacles."
-    },
-    {
-        name: "Capture the water",
-        link: "/capturethewater",
-        poster: "img/event/event1.png",
-        description: "In an ever-changing world, the challenges of daily life are progressively intensifying. Each passing day brings forth greater difficulties, making it imperative to discover effective solutions and inspire fresh ideas to overcome these obstacles."
-    },
-    {
-        name: "Cryptic Clues",
-        link: "/crypticclues",
-        poster: "img/event/event1.png",
-        description: "In an ever-changing world, the challenges of daily life are progressively intensifying. Each passing day brings forth greater difficulties, making it imperative to discover effective solutions and inspire fresh ideas to overcome these obstacles."
-    }
-]
+const Events = [
+  {
+    name: "Boat Wars",
+    link: "/Boatwars",
+    poster: "img/event/BoatWars.jpg",
+    description:
+      "Boat Wars: A water-based event where participants battle in boats, kayaks, and canoes. It blends water sports and strategy, aiming for fun and skill in water-based combat, delighting participants and spectators.",
+  },
+  {
+    name: "Aqua-Innovate",
+    link: "/AquaMOD",
+    poster: "img/event/AquaInnovate.jpg",
+    description:
+      "Aqua-Innovate offers a unique platform to demonstrate real-life skills. Participants enhance vessel efficiency through creativity and critical thinking, fostering problem-solving abilities.",
+  },
+  {
+    name: "Aqua-Exposure",
+    link: "/Aquaexposure",
+    poster: "img/event/AquaExposure.jpg",
+    description:
+      "Aqua-Exposure highlights the significance of ocean engineering and naval architecture with cool and unique photos, encouraging photographers to be ethical and genuine in their art.",
+  },
+  {
+    name: "WaveQuest",
+    link: "/Wavequest",
+    poster: "img/event/WaveQuest.jpg",
+    description:
+      "In an evolving world with increasing challenges, research becomes vital for innovative solutions. Samudramanthan, IIT, Kharagpur, is dedicated to fostering a culture of research and innovation to address these obstacles.",
+  },
+  {
+    name: "Deep Sea Dispustes",
+    link: "/dispustes",
+    poster: "img/event/DeepSeaDispustes.jpg",
+    description:
+      "Ocean Matters debate fosters critical thinking, research, and public speaking skills. It encourages dynamic discussions on marine conservation, promoting exploration of diverse perspectives.",
+  },
+  {
+    name: "Quizathon",
+    link: "/Quizathon",
+    poster: "img/event/Quizathon.jpg",
+    description:
+      "Quizathon offers a unique quiz competition focused on ocean knowledge, naval architecture, and puzzles. It attracts enthusiasts seeking to enhance their understanding while enjoying a creative self-evaluation experience.",
+  },
+  {
+    name: "Ocean Oddessey",
+    link: "/paperprep",
+    poster: "img/event/OceanOddessey.jpg",
+    description:
+      " In an ever-changing world, the challenges of daily life are progressively intensifying. Each passing day brings forth greater difficulties, making it imperative to discover effective solutions and inspire fresh ideas to overcome these obstacles.",
+  },
+  {
+    name: "Cryptic Clues",
+    link: "/CrypticClues",
+    poster: "img/event/CrypticClues.jpg",
+    description:
+      "Join Samudra Manthan 2023's thrilling treasure hunt, where sharp minds and keen eyes are key. Solve puzzles, crack codes, and uncover mysteries to discover priceless artifacts. Unleash your inner explorer in this exciting voyage!",
+  },
+];
 
 export default Events;

@@ -3,8 +3,9 @@ import EventData from "../data/EventData";
 import axios from "axios";
 import MyVerticallyCenteredModal from "./DetailsModel";
 
-function EventDetail(link) {
-  const event = EventData.find(({ link }) => link === link);
+function EventDetail({link}) {
+  const event = EventData.find(({ link:eventlink }) => eventlink === link);
+  console.log(event)
   const [modalShow, setModalShow] = React.useState(false);
   const [user, setUser] = React.useState({});
   const [isRegistered, setIsRegistered] = React.useState(false);
