@@ -1,6 +1,6 @@
 import React from "react";
 import Events from "../data/EventShort";
-import {Link} from 'react-router-dom';
+
 function EventSection() {
 
     return(
@@ -12,13 +12,14 @@ function EventSection() {
                 </div>
                 <div class="row g-4">
                     {Events.map((event) => (
-                        <div class="col-lg-4 col-md-6 wow fadeInUp h-100" data-wow-delay="0.1s">
-                        <Link to={event.link}>
-                        <div class="feature-item bg-light rounded p-4" style={{display: "flex", alignItems:"center"}}>
-                            <i class="fa-solid fa-anchor fa-xl mx-2"></i>
-                            <h5 style={{marginBottom: "0px"}}>{event.name}</h5>
+                        <div class="col-lg-4 col-md-6 wow fadeInUp" data-wow-delay="0.1s">
+                        <a href={"/event"+event.link}>
+                        <div class="feature-item bg-light rounded p-4">
+                            <img src={event.poster} alt="High Resolution Icon" class="event-poster bg-primary-gradient rounded "/>
+                            <h5 class="mb-3">{event.name}</h5>
+                            <p style={{color:"#919294"}}class="m-0">{event.description}</p>
                         </div>
-                        </Link>
+                        </a>
                     </div>
                     ))}
                 </div>

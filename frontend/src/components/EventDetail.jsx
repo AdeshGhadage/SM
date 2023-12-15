@@ -3,9 +3,8 @@ import EventData from "../data/EventData";
 import axios from "axios";
 import MyVerticallyCenteredModal from "./DetailsModel";
 
-function EventDetail({link}) {
-  const event = EventData.find(({ link:eventlink }) => eventlink === link);
-  console.log(event)
+function EventDetail(link) {
+  const event = EventData.find(({ link }) => link === link);
   const [modalShow, setModalShow] = React.useState(false);
   const [user, setUser] = React.useState({});
   const [isRegistered, setIsRegistered] = React.useState(false);
@@ -42,8 +41,8 @@ function EventDetail({link}) {
       currency: data.currency,
       teamSize: data.teamSize,
     });
-
     setModalShow(true);
+    // check if user is registered to tshirt 
   }
 
   return (

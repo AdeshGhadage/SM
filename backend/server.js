@@ -40,20 +40,21 @@ const jwt = require("jsonwebtoken");
 
 //importing schema
 const Registration = require("./Schema/user");
-
 const Event = require("./Schema/eventSchema");
+const Cap = require("./Schema/capSchema");
+const Tshirt = require("./Schema/tshirtSchema");
 const { Console } = require("console");
 
 //cors
 app.use(cors());
 
 app.post("/register", async (req, res) => {
-  var val = getRandomInt(1000);
-  const user = await Registration.findOne({ sm_id: "24SM" + val });
-  while (user) {
-    val = getRandomInt(1000);
-  }
-  var sm_id = "24SM" + val;
+  // var val = getRandomInt(1000);
+  // const user = await Registration.findOne({ sm_id: "24SM" + val });
+  // while (user) {
+  //   val = getRandomInt(1000);
+  // }
+  // var sm_id = "24SM" + val;
   if (req.body.password.length < 8) {
     res.send("password should be of atleast 8 characters");
   } else {
@@ -72,7 +73,6 @@ app.post("/register", async (req, res) => {
           name: req.body.name,
           email: req.body.email,
           password: password_hash,
-          sm_id: sm_id,
           college: req.body.college,
           contact: req.body.contact,
           created_at: Date.now(),
@@ -98,16 +98,16 @@ app.post("/register", async (req, res) => {
 
 //login and authentication using jwt and cookie-parser
 app.post("/login", async (req, res) => {
-  sm_id = req.body.sm_id;
+  email = req.body.sm_id;
   password = req.body.password;
   try {
-    const user = await Registration.findOne({ sm_id: sm_id });
+    const user = await Registration.findOne({ email: email });
     if (user) {
       const password_match = await bcrypt.compare(password, user.password);
       if (password_match) {
         const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET);
         await Registration.updateOne(
-          { sm_id: sm_id },
+          { email: email },
           { $set: { token: token } }
         );
         console.log(token);
@@ -209,7 +209,9 @@ app.post("/success/capturethewater", async (req, res) => {
       // Store the user details in the event collection
       event.paymentId = razorpay_payment_id;
       event.save();
+      // redirect to success page
       res.send("Payment successful");
+
     } else {
       // User not found
       res.status(400).send("User not found for the given order ID.");
@@ -221,7 +223,7 @@ app.post("/success/capturethewater", async (req, res) => {
 });
 
 //register in event
-// name: data.name,
+//      name: data.name,
 //       email: data.email,
 //       contact: data.contact,
 //       link: event.link,
@@ -261,6 +263,198 @@ app.post("/register/event", async (req, res) => {
       res.status(400).send("failed to add in event");
     });
 });
+
+//Campus Ambassador
+app.post("/cap", async (req, res) => {
+  const data = req.body;
+  console.log(data);
+  const cap = new Cap({
+    name: data.name,
+    email: data.email,
+    sm_id: data.sm_id,
+    college: data.college,
+    contact: data.contact,
+    major: data.major,
+    yos: data.yos,
+    sm: data.sm,
+    idea: data.idea,
+    experience: data.experience,
+    whysm: data.whysm,
+    created_at: Date.now(),
+  });
+  cap
+    .save()
+    .then((result) => {
+      console.log(result);
+      res.status(200).send("success");
+    })
+    .catch((err) => {
+      console.log(err);
+      res.status(400).send("failed to add in cap");
+    });
+});
+
+//is user registered in campus ambassador
+app.post("/cap/isregistered", async (req, res) => {
+  const token = req.body.token;
+  const decoded = jwt.verify(token, process.env.JWT_SECRET);
+  const user = await Registration.findOne({ _id: decoded.id });
+  const cap = await Cap.findOne({ sm_id: user.sm_id });
+  if (cap) {
+    res.status(200).send("submitted");
+  } else {
+    res.status(400).send("failed");
+  }
+});
+
+//is user registered in event which as same event name
+app.post("/event/isregistered", async (req, res) => {
+  const token = req.body.token;
+  const event_name = req.body.link;
+  const decoded = jwt.verify(token, process.env.JWT_SECRET);
+  const user = await Registration.findOne({ _id: decoded.id });
+  const event = await Event.findOne({ sm_id: user.sm_id, event: event_name });
+  console.log(event);
+  if (event) {
+    res.status(200).send(true);
+  } else {
+    res.status(200).send(false);
+  }
+});
+
+//tshirt
+// check if user is registered in tshirt
+app.post("/tshirt/isregistered", async (req, res) => {
+  const token = req.body.token;
+  const decoded = jwt.verify(token, process.env.JWT_SECRET);
+  const user = await Registration.findOne({ _id: decoded.id });
+  const tshirt = await Tshirt.findOne({ sm_id: user.sm_id });
+  if (tshirt) {
+    res.status(200).send(true);
+  } else {
+    res.status(400).send(false);
+  }
+});
+
+//razorpay payment gateway for tshirt
+app.post("/razorpay/tshirt", async (req, res) => {
+  const token = req.body.token;
+  console.log(token);
+  const decoded = jwt.verify(token, process.env.JWT_SECRET);
+  const user = await Registration.findOne({ _id: decoded.id });
+  console.log(user);
+
+  const amount = 100;
+  const options = {
+    amount: (amount * 100).toString(),
+    currency: "INR",
+    receipt: shortid.generate(),
+  };
+  try {
+    const response = await razorpay.orders.create(options);
+    //update tshirt order id in user database
+    user.tshirtorderId = response.id;
+    await user.save();
+    console.log("tshirt order id updated in user database");
+    res.json({
+      id: response.id,
+      currency: response.currency,
+      amount: response.amount,
+      name: user?.name,
+      email: user?.email,
+      contact: user?.contact,
+      sm_id: user?.sm_id,
+    });
+  } catch (error) {
+    console.log(error);
+  }
+});
+
+// Handle the Razorpay webhook endpoint for tshirt
+app.post("/success/tshirt", async (req, res) => {
+  const body = req.body;
+  const { razorpay_payment_id, razorpay_order_id, razorpay_signature } = body;
+  // Verify the signature
+  const generatedSignature = crypto
+    .createHmac("sha256", process.env.RAZORPAY_KEY_SECRET)
+    .update(razorpay_order_id + "|" + razorpay_payment_id)
+    .digest("hex");
+
+  console.log(generatedSignature, razorpay_signature);
+  if (generatedSignature === razorpay_signature) {
+    // Signature is valid. Fetch user details based on the order ID or any identifier.
+    const tshirt = await Tshirt.findOne({ orderId: razorpay_order_id });
+    const sm_id_genearated = "24SM" + getRandomInt(1000);
+    const user = await Registration.findOne({email: tshirt.email});
+    if (tshirt) {
+      // Store the user details in the event collection
+      tshirt.paymentId = razorpay_payment_id;
+      tshirt.smId = sm_id_genearated;
+      user.sm_id = sm_id_genearated;
+      await user.save();
+      tshirt.save();
+      // redirect to success page
+      
+      res.send("Payment successful");
+    } else {
+      // User not found
+      res.status(400).send("User not found for the given order ID.");
+    }
+  } else {
+    // Invalid webhook, do not process.
+    res.status(400).send("Invalid webhook signature.");
+  }
+
+});
+
+//tshirt registration
+//during tshirt if tshirt is not registered then sm_id is generated if it is registered then sm_id is returned
+// app.post("/tshirt", async (req, res) => {
+//   const token = req.body.token;
+//   const decoded = jwt.verify(token, process.env.JWT_SECRET);
+//   const user = await Registration.findOne({ _id: decoded.id });
+//   const isregistered = await Tshirt.findOne({ sm_id: user.sm_id });
+//   if (isregistered) {
+//     res.status(400).send("already registered");
+//   } else {
+//     const sm_id_genearated = "24SM" + getRandomInt(1000);
+//     user.sm_id = sm_id_genearated;
+//     await user.save();
+//     const tshirt = new Tshirt({
+//       name: user.name,
+//       email: user.email,
+//       sm_id: sm_id_genearated,
+//       college: user.college,
+//       contact: user.contact,
+//       orderId: user.tshirtorderId,
+//       created_at: Date.now(),
+//     });
+//     tshirt
+//       .save()
+//       .then((result) => {
+//         console.log(result);
+//         res.status(200).send("added to tshirt");
+//       })
+//       .catch((err) => {
+//         console.log(err);
+//         res.status(400).send("failed to add in tshirt");
+//       });
+//   }
+// });
+
+//istshirt registered
+app.post("/tshirt/isregistered", async (req, res) => {
+  const token = req.body.token;
+  const decoded = jwt.verify(token, process.env.JWT_SECRET);
+  const user = await Registration.findOne({ _id: decoded.id });
+  const tshirt = await Tshirt.findOne({ sm_id: user.sm_id });
+  if (tshirt) {
+    res.status(200).send("submitted");
+  } else {
+    res.status(400).send("failed");
+  }
+});
+
 
 app.listen(process.env.PORT, () => {
   console.log("Server is running on port " + process.env.PORT);

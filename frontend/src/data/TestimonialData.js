@@ -1,39 +1,28 @@
 const testimonialData = [
-  {
-    imglink: "img/tutul.jpg",
-    name: "Tutul Samanta",
-    profession: "Indian Maritime University, Kolkata campus ",
-    testimonial:
-      "First time in Samudramanthan! Amazing experience Won Best Campus Ambassador Award Will Come again!.",
-  },
-  {
-    imglink: "img/surya.jpg",
-    name: "Surya Vamsi Krishna ",
-    profession: "Marine Engineering at HIMT college",
-    testimonial:
-      "It was really a great event with a really wonderful exposure to the hub of smart thinkers. All credits goes to the organizers who have been as the backbone for the event to be successful. Good luck guys.",
-  },
-  {
-    imglink: "img/shubh.jpg",
-    name: "Shubh M Shivolkar",
-    profession: "Indian Maritime University, Visakhapatnam Campus ",
-    testimonial:
-      "it was a great experience hoping next time ull come up with even more best of luck.",
-  },
-  {
-    imglink: "img/akash.jpg",
-    name: "Akash Meena ",
-    profession: "IIT Kharagpur ",
-    testimonial:
-      "The national level inter college annual technical meet of the department of Ocean Engineering and Naval Architecture, IIT Kharagpur organized by Naval Architecture and Ocean Engineering Society (NAROES), IIT Kharagpur in every spring semester. Samudramanthan’s journey toward excellence started in 2009 with its first ever edition.",
-  },
-  {
-    imglink: "img/amdad.jpg",
-    name: "Amdad Muhammed ",
-    profession: "IIT Kharagpur ",
-    testimonial:
-      "We came here not sure what to expect. Today we are leaving hoping to come back again. Wonderfully organized & the efforts towards improvement put by their team is heartening.",
-  },
-];
+    {
+        imglink:"img/testimonial-1.jpg",
+        name:"Saul Goodman",
+        profession:"Ceo &amp; Founder",
+        testimonial:"Proin iaculis purus consequat sem cure digni ssim. Donec porttitora entum suscipit aenean rhoncus posuere odio in tincidunt.",
+    },
+    {
+        imglink:"img/testimonial-2.jpg",
+        name:"Sara Wilsson",
+        profession:"Designer",
+        testimonial:"Export tempor illum tamen malis malis eram quae irure esse labore quem cillum quid cillum eram malis quorum velit fore eram velit sunt aliqua noster fugiat irure amet legam anim culpa.",
+    },
+    {
+        imglink:"img/testimonial-3.jpg",
+        name:"Jena Karlis",
+        profession:"Store Owner",
+        testimonial:"Enim nisi quem export duis labore cillum quae magna enim sint quorum nulla quem veniam duis minim tempor labore quem eram duis noster aute amet eram fore quis sint minim.",
+    },
+    {
+        imglink:"img/testimonial-4.jpg",
+        name:"Matt Brandon",
+        profession:"Freelancer",
+        testimonial:"Fugiat enim eram quae cillum dolore dolor amet nulla culpa multos export minim fugiat minim velit minim dolor enim duis veniam ipsum anim magna sunt elit fore quem dolore labore illum veniam.",
+    }
+]
 
 export default testimonialData;
