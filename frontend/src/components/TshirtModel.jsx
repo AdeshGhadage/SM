@@ -28,9 +28,11 @@ function TshirtModal(props) {
       size: props.user.size,
     };
     axios
-      .post("http://localhost:5000/tshirt/isregistered", data)
+      .post("http://localhost:5000/tshirt", data)
       .then((res) => {
-        console.log("You have successfully added to the tshirt");
+        console.log("response: ");
+        console.log(res);
+        
       })
       .catch((err) => console.log(err));
   }

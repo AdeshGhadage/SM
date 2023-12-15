@@ -171,10 +171,9 @@ app.post("/razorpay/capturethewater", async (req, res) => {
     await Registration.updateOne(
       { _id: decoded.id },
       { $set: { orderId: response.id } }
-    )
-      .then((result) => {
-        console.log(result);
-      })
+    ).then((result) => {
+      console.log(result);
+    });
     console.log("order id updated in user database");
     res.json({
       id: response.id,
@@ -211,7 +210,6 @@ app.post("/success/capturethewater", async (req, res) => {
       event.save();
       // redirect to success page
       res.send("Payment successful");
-
     } else {
       // User not found
       res.status(400).send("User not found for the given order ID.");
@@ -236,10 +234,10 @@ app.post("/register/event", async (req, res) => {
   const token = req.body.token;
   const decoded = jwt.verify(token, process.env.JWT_SECRET);
   const user = await Registration.findOne({ _id: decoded.id });
-  console.log("user : ")
+  console.log("user : ");
   console.log(user);
   const data = req.body;
-  console.log("data : ")
+  console.log("data : ");
   console.log(data);
   const event = new Event({
     name: user.name,
@@ -328,11 +326,14 @@ app.post("/tshirt/isregistered", async (req, res) => {
   const token = req.body.token;
   const decoded = jwt.verify(token, process.env.JWT_SECRET);
   const user = await Registration.findOne({ _id: decoded.id });
-  const tshirt = await Tshirt.findOne({ sm_id: user.sm_id });
+  const tshirt = await Tshirt.findOne({ smId: user.sm_id });
+  console.log("tshirt: ");
+  console.log(tshirt);
   if (tshirt) {
-    res.status(200).send(true);
+    //send sm_id
+    res.status(200).send(user.sm_id);
   } else {
-    res.status(400).send(false);
+    res.status(200).send(false);
   }
 });
 
@@ -344,29 +345,33 @@ app.post("/razorpay/tshirt", async (req, res) => {
   const user = await Registration.findOne({ _id: decoded.id });
   console.log(user);
 
-  const amount = 100;
-  const options = {
-    amount: (amount * 100).toString(),
-    currency: "INR",
-    receipt: shortid.generate(),
-  };
-  try {
-    const response = await razorpay.orders.create(options);
-    //update tshirt order id in user database
-    user.tshirtorderId = response.id;
-    await user.save();
-    console.log("tshirt order id updated in user database");
-    res.json({
-      id: response.id,
-      currency: response.currency,
-      amount: response.amount,
-      name: user?.name,
-      email: user?.email,
-      contact: user?.contact,
-      sm_id: user?.sm_id,
-    });
-  } catch (error) {
-    console.log(error);
+  if (user.tshirtorderId) {
+    res.status(200).send("already registered");
+  } else {
+    const amount = 100;
+    const options = {
+      amount: (amount * 100).toString(),
+      currency: "INR",
+      receipt: shortid.generate(),
+    };
+    try {
+      const response = await razorpay.orders.create(options);
+      //update tshirt order id in user database
+      user.tshirtorderId = response.id;
+      await user.save();
+      console.log("tshirt order id updated in user database");
+      res.json({
+        id: response.id,
+        currency: response.currency,
+        amount: response.amount,
+        name: user?.name,
+        email: user?.email,
+        contact: user?.contact,
+        sm_id: user?.sm_id,
+      });
+    } catch (error) {
+      console.log(error);
+    }
   }
 });
 
@@ -381,11 +386,16 @@ app.post("/success/tshirt", async (req, res) => {
     .digest("hex");
 
   console.log(generatedSignature, razorpay_signature);
+  console.log(razorpay_order_id);
   if (generatedSignature === razorpay_signature) {
     // Signature is valid. Fetch user details based on the order ID or any identifier.
+    //add sm id to user and tshirt 
     const tshirt = await Tshirt.findOne({ orderId: razorpay_order_id });
+    const user = await Registration.findOne({tshirtorderId: razorpay_order_id});
     const sm_id_genearated = "24SM" + getRandomInt(1000);
-    const user = await Registration.findOne({email: tshirt.email});
+    console.log("tshirt: ");
+    console.log(tshirt);
+    
     if (tshirt) {
       // Store the user details in the event collection
       tshirt.paymentId = razorpay_payment_id;
@@ -394,7 +404,7 @@ app.post("/success/tshirt", async (req, res) => {
       await user.save();
       tshirt.save();
       // redirect to success page
-      
+
       res.send("Payment successful");
     } else {
       // User not found
@@ -404,43 +414,38 @@ app.post("/success/tshirt", async (req, res) => {
     // Invalid webhook, do not process.
     res.status(400).send("Invalid webhook signature.");
   }
-
 });
 
 //tshirt registration
 //during tshirt if tshirt is not registered then sm_id is generated if it is registered then sm_id is returned
-// app.post("/tshirt", async (req, res) => {
-//   const token = req.body.token;
-//   const decoded = jwt.verify(token, process.env.JWT_SECRET);
-//   const user = await Registration.findOne({ _id: decoded.id });
-//   const isregistered = await Tshirt.findOne({ sm_id: user.sm_id });
-//   if (isregistered) {
-//     res.status(400).send("already registered");
-//   } else {
-//     const sm_id_genearated = "24SM" + getRandomInt(1000);
-//     user.sm_id = sm_id_genearated;
-//     await user.save();
-//     const tshirt = new Tshirt({
-//       name: user.name,
-//       email: user.email,
-//       sm_id: sm_id_genearated,
-//       college: user.college,
-//       contact: user.contact,
-//       orderId: user.tshirtorderId,
-//       created_at: Date.now(),
-//     });
-//     tshirt
-//       .save()
-//       .then((result) => {
-//         console.log(result);
-//         res.status(200).send("added to tshirt");
-//       })
-//       .catch((err) => {
-//         console.log(err);
-//         res.status(400).send("failed to add in tshirt");
-//       });
-//   }
-// });
+app.post("/tshirt", async (req, res) => {
+  const token = req.body.token;
+  const decoded = jwt.verify(token, process.env.JWT_SECRET);
+  const user = await Registration.findOne({ _id: decoded.id });
+  // const isregistered = await Tshirt.findOne({ sm_id: user.sm_id });
+  // if (isregistered) {
+  //   res.status(400).send("already registered");
+  // } else {
+    const tshirt = new Tshirt({
+      name: user.name,
+      email: user.email,
+      college: user.college,
+      contact: user.contact,
+      orderId: user.tshirtorderId,
+      created_at: Date.now(),
+    });
+    tshirt
+      .save()
+      .then((result) => {
+        console.log(result);
+        res.status(200).send("added to tshirt");
+      })
+      .catch((err) => {
+        console.log(err);
+        res.status(400).send("failed to add in tshirt");
+      });
+  // }
+});
 
 //istshirt registered
 app.post("/tshirt/isregistered", async (req, res) => {
@@ -454,7 +459,6 @@ app.post("/tshirt/isregistered", async (req, res) => {
     res.status(400).send("failed");
   }
 });
-
 
 app.listen(process.env.PORT, () => {
   console.log("Server is running on port " + process.env.PORT);
