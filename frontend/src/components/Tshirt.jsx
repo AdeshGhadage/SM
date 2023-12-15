@@ -10,15 +10,21 @@ function Tshirt() {
   //get tshirt data if user is registered to tshirt
   React.useEffect(() => {
     async function getTshirtsmid() {
-      const data = await axios
-        .post("http://localhost:5000/tshirt/isregistered", {
-          token: localStorage.getItem("token"),
-        })
-        .then((t) => t.data);
-      if (data) {
-        setSm_id(data);
-      } else {
-        setSm_id("Buy Now");
+      if (localStorage.getItem("token")) {
+        const data = await axios
+          .post("http://localhost:5000/tshirt/isregistered", {
+            token: localStorage.getItem("token"),
+          })
+          .then((t) => t.data);
+        if (data) {
+          setSm_id(data);
+        } else {
+          setSm_id("Buy Now");
+        }
+      }
+      else
+      {
+        console.log("Not Registered User");
       }
     }
     getTshirtsmid();
@@ -35,16 +41,16 @@ function Tshirt() {
     // if (data == "already registered") {
     //   alert("You have already registered for Tshirt");
     // } else {
-      setUser({
-        name: data.name,
-        email: data.email,
-        contact: data.contact,
-        id: data.id,
-        sm_id: data.sm_id,
-        amount: data.amount,
-        currency: data.currency,
-      });
-      setModalShow(true);
+    setUser({
+      name: data.name,
+      email: data.email,
+      contact: data.contact,
+      id: data.id,
+      sm_id: data.sm_id,
+      amount: data.amount,
+      currency: data.currency,
+    });
+    setModalShow(true);
     // }
   }
   return (
