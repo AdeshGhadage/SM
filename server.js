@@ -68,7 +68,7 @@ app.use(cors());
 //need to update cors origin
 
 app.get("/", (req, res) => {
-  res.send("Hello World");
+  res.send("BackEnd is running Bitch");
 });
 
 app.post("/register", async (req, res) => {
