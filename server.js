@@ -6,13 +6,13 @@ const Razorpay = require("razorpay");
 const shortid = require("shortid");
 const crypto = require("crypto");
 require("dotenv").config();
-
+const sendEmail = require('./middleware/sendEmail')
 const app = express();
 const {fees} = require('./constants/events')
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
-
+const nodemailer = require('nodemailer');
 // Connect to MongoDB
 mongoose.connect(process.env.DB_URL, {
   useNewUrlParser: true,
@@ -45,7 +45,7 @@ const Cap = require("./Schema/capSchema");
 const Tshirt = require("./Schema/tshirtSchema");
 const TshirtOrders = require("./Schema/tshirtOrdersSchema");
 const EventOrders = require("./Schema/eventOrderSchema");
-const nodemailer = require("nodemailer");
+
 const redis = require('ioredis');
 //razorpay payment gateway for capturethewater event
 const razorpay = new Razorpay({
@@ -54,12 +54,14 @@ const razorpay = new Razorpay({
 });
 
 // const transporter = nodemailer.createTransport({
-//   service: "Gmail",
-//   auth: {
-//     user: 'samudramanthan.iitkgp@gmail.com',
-//     pass: "Naroes@123",
-//   },
-// });
+//   port: 465,               // true for 465, false for other ports
+//   host: "smtp.gmail.com",
+//      auth: {
+//           user: 'samudramanthan.iitkgp@gmail.com',
+//           pass: process.env.APP_PASSWORD,
+//        },
+//   secure: true,
+//   });
 
 // console.log(transporter)
 
@@ -68,7 +70,7 @@ app.use(cors());
 //need to update cors origin
 
 app.get("/", (req, res) => {
-  res.send("BackEnd is running Bitch");
+  res.send("Hello World");
 });
 
 app.post("/register", async (req, res) => {
@@ -84,6 +86,7 @@ app.post("/register", async (req, res) => {
     const alreadyRegistered = await Registration.findOne({
       email: req.body.email,
     });
+
 
     if (alreadyRegistered) {
       return res.status(409).json({
@@ -102,6 +105,8 @@ app.post("/register", async (req, res) => {
       contact: req.body.contact,
       created_at: Date.now(),
     });
+
+    
 
     registrationData
       .save()
@@ -168,7 +173,14 @@ app.post("/login", async (req, res) => {
       status: "success",
       message: "Login successful",
       token: token,
-      user: user
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        smId: user.smId,
+        college: user.college,
+        contact: user.contact,
+      }
     });
   } catch (error) {
     console.error(error);
@@ -564,6 +576,13 @@ app.post("/orders", async (req, res) => {
     }
 
     // Check if any teammate is already registered in another team for the same event
+    console.log(teammembers)
+    for(const teammate of teammembers){
+      const isRegister = await Registration.findOne({smId: teammate});
+      if(!isRegister){
+        return res.status(400).json({error: `User with smId ${teammate} does not exists`})
+      }
+    }
     
     for (const teammate of teammembers) {
       // Check if the teammate is already part of another team
@@ -581,7 +600,8 @@ app.post("/orders", async (req, res) => {
     }
 
     // Retrieve event fees
-    amount = fees[event]; // Assuming `fees` is a predefined object mapping event names to fees
+    console.log(fees[event], teammembers.length)
+    amount = fees[event] * ((teammembers!==null && teammembers.length > 0) ? teammembers.length + 1 : 1); // Assuming `fees` is a predefined object mapping event names to fees
     console.log(amount)
     if (amount === undefined) {
       return res.status(400).json({ error: `No event with name '${event}' was found.` });
@@ -699,6 +719,13 @@ app.post("/verify-payment/tshirt", async (req, res) => {
       email: updatedOrder.email,
       contact: updatedOrder.contact,
     });
+
+    // sendEmail(transporter, 'registration', {
+    //   from: 'samudramanthan.iitkgp@gmail.com',
+    //   to: updatedOrder.email,
+    //   subject: 'Welcome to Samudramanthan 2025',
+    //   sm_id: sm_id_generated,
+    // })
 
     res.status(200).json({
       success: "success",
@@ -908,13 +935,21 @@ app.post("/event/isregistered", async (req, res) => {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     const user = await Registration.findOne({ _id: decoded.id });
 
+    if (!user.smId) {
+      return res.status(200).json({
+        status: "success",
+        message: "User is not registered for the event.",
+        isRegistered: false,
+        data: {}
+      });
+    }
     // Check if the user is registered for the event
     const event = await Event.findOne({
+      event: event_name,
       $or: [
         { smId: user.smId },
-        { teammembers: { $in: [user.smId] } }
-      ],
-      event: event_name
+        { teammembers: user.smId }
+      ]
     });
     
     // Respond based on whether the user is registered for the event
