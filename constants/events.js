@@ -1,12 +1,12 @@
 exports.fees = {
-    AquaMOD: 100,
-    Dispustes: 100,
-    Aquaexposure: 100,
-    Boatwars: 100,
-    Wavequest: 100,
-    Quizathon: 100,
-    Tressurehunt: 100,
+    AquaMOD: 200,
+    Dispustes: 200,
+    Aquaexposure: 120,
+    Boatwars: 300,
+    Wavequest: 200,
+    Quizathon: 200,
+    Tressurehunt: 120,
     tShirt: 100,
-    Paperprep: 100,
-    Capturethewater: 100
+    Paperprep: 200,
+    Capturethewater: 200
 }
