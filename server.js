@@ -70,7 +70,7 @@ app.use(cors());
 //need to update cors origin
 
 app.get("/", (req, res) => {
-  res.send("Hello World updated sendEmail and referal section");
+  res.send("Hello World updated referal section");
 });
 
 app.post("/register", async (req, res) => {
@@ -744,12 +744,12 @@ app.post("/verify-payment/tshirt", async (req, res) => {
       }
     }
 
-    sendEmail(transporter, 'registration', {
-      from: 'samudramanthan.iitkgp@gmail.com',
-      to: updatedOrder.email,
-      subject: 'Welcome to Samudramanthan 2025',
-      sm_id: sm_id_generated,
-    })
+    // sendEmail(transporter, 'registration', {
+    //   from: 'samudramanthan.iitkgp@gmail.com',
+    //   to: updatedOrder.email,
+    //   subject: 'Welcome to Samudramanthan 2025',
+    //   sm_id: sm_id_generated,
+    // })
 
     res.status(200).json({
       success: "success",
