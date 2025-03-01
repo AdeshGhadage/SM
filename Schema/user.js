@@ -11,6 +11,7 @@ const userSchema = new mongoose.Schema({
     resetToken: String,
     orderId: String,
     tshirtorderId: String,
+    referralCount: { type: Number, default: 0 }
 });
 
 

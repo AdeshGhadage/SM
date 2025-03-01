@@ -6,6 +6,7 @@ const tShirtOrderSchema = new moongoose.Schema({
     razorpayOrderId: String,
     paymentId: String,
     amount: Number,
+    referral: String,
     paid: {type: Boolean, default: false},
     createdAt: { type: Date, default: Date.now },
 });

@@ -70,11 +70,11 @@ app.use(cors());
 //need to update cors origin
 
 app.get("/", (req, res) => {
-  res.send("Hello World");
+  res.send("Hello World updated sendEmail and referal section");
 });
 
 app.post("/register", async (req, res) => {
-  console.log(req.body)
+  // console.log(req.body)
   if (!req.body.password || req.body.password.length < 4) {
     return res.status(400).json({
       status: "error",
@@ -168,7 +168,7 @@ app.post("/login", async (req, res) => {
 
     // await Registration.updateOne({ email: email }, { $set: { token: token } });
 
-    console.log(token, user);
+    // console.log(token, user);
     return res.status(200).json({
       status: "success",
       message: "Login successful",
@@ -541,7 +541,7 @@ app.get("/user", async (req, res) => {
 
 app.post("/orders", async (req, res) => {
   
-  const { event, teammembers, type, size, token } = req.body;
+  const { event, teammembers, type, size, token, referral } = req.body;
 
   if (!token || !type ) {
     return res.status(400).json({
@@ -564,6 +564,15 @@ app.post("/orders", async (req, res) => {
     });
   }
 
+
+  let referralValid = false;
+  let referralUser = null;
+  
+  if (referral) {
+    referralUser = await Registration.findOne({ smId: referral });
+    referralValid = !!referralUser;
+  }
+
   let amount;
   if (type === "event") {
     // Event Registration Validation
@@ -576,7 +585,7 @@ app.post("/orders", async (req, res) => {
     }
 
     // Check if any teammate is already registered in another team for the same event
-    console.log(teammembers)
+    // console.log(teammembers)
     for(const teammate of teammembers){
       const isRegister = await Registration.findOne({smId: teammate});
       if(!isRegister){
@@ -600,9 +609,9 @@ app.post("/orders", async (req, res) => {
     }
 
     // Retrieve event fees
-    console.log(fees[event], teammembers.length)
+    // console.log(fees[event], teammembers.length)
     amount = fees[event] * ((teammembers!==null && teammembers.length > 0) ? teammembers.length + 1 : 1); // Assuming `fees` is a predefined object mapping event names to fees
-    console.log(amount)
+    // console.log(amount)
     if (amount === undefined) {
       return res.status(400).json({ error: `No event with name '${event}' was found.` });
     }
@@ -627,13 +636,14 @@ app.post("/orders", async (req, res) => {
         size,
         amount,
         razorpayOrderId: razorpayOrder.id,
+        referral: referralValid ? referral : null,
       };
   
       // Save the order
       const newOrder = new TshirtOrders(orderData);
       await newOrder.save();
     } else{
-      console.log(teammembers)
+      // console.log(teammembers)
       const orderData = {
         smId: user.smId,
         contact: user.contact,
@@ -669,7 +679,7 @@ app.post("/orders", async (req, res) => {
 
 app.post("/verify-payment/tshirt", async (req, res) => {
   const { razorpay_order_id, razorpay_payment_id, razorpay_signature } = req.body;
-  console.log(req.body)
+  // console.log(req.body)
   if (!razorpay_order_id || !razorpay_payment_id || !razorpay_signature) {
     return res.status(400).json({ success: false, message: "Missing required payment details." });
   }
@@ -718,14 +728,28 @@ app.post("/verify-payment/tshirt", async (req, res) => {
       size: updatedOrder.size,
       email: updatedOrder.email,
       contact: updatedOrder.contact,
+      referral: updatedOrder.referral, // Store the referral code
     });
 
-    // sendEmail(transporter, 'registration', {
-    //   from: 'samudramanthan.iitkgp@gmail.com',
-    //   to: updatedOrder.email,
-    //   subject: 'Welcome to Samudramanthan 2025',
-    //   sm_id: sm_id_generated,
-    // })
+    if (updatedOrder.referral) {
+      // Check if the referral ID exists in the Registration collection
+      const referringUser = await Registration.findOne({ smId: updatedOrder.referral });
+    
+      if (referringUser) {
+        // If referral ID is valid, increment referralCount
+        await Registration.findOneAndUpdate(
+          { smId: updatedOrder.referral },
+          { $inc: { referralCount: 1 } }
+        );
+      }
+    }
+
+    sendEmail(transporter, 'registration', {
+      from: 'samudramanthan.iitkgp@gmail.com',
+      to: updatedOrder.email,
+      subject: 'Welcome to Samudramanthan 2025',
+      sm_id: sm_id_generated,
+    })
 
     res.status(200).json({
       success: "success",
@@ -767,7 +791,7 @@ app.post("/verify-payment/event", async (req, res) => {
       { new: true }
     );
 
-    console.log(updatedOrder);
+    // console.log(updatedOrder);
 
     if (!updatedOrder) {
       return res.status(404).json({ success: "error", message: "Event order not found!" });
@@ -847,7 +871,7 @@ app.post("/cap", async (req, res) => {
 
     const result = await cap.save();
 
-    console.log("Campus Ambassador data saved:", result);
+    // console.log("Campus Ambassador data saved:", result);
 
     return res.status(200).json({
       status: "success",

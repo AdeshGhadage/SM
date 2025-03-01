@@ -6,6 +6,7 @@ const tshirtSchema = new moongoose.Schema({
     size: String,
     orderId: String,
     paymentId: String,
+    referral: String,
     createdAt: { type: Date, default: Date.now },
 });
 module.exports = moongoose.model('Tshirt', tshirtSchema);
