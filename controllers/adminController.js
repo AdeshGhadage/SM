@@ -9,7 +9,7 @@ const SECRET_KEY = process.env.JWT_SECRET;
 // Admin Login
 exports.loginAdmin = async (req, res) => {
     const { email, password } = req.body;
-    console.log(email, password);
+    // console.log(email, password);
 
     if (email !== ADMIN_USERNAME) {
         return res.status(403).json({ status: "error", message: "Unauthorized" });
@@ -19,7 +19,7 @@ exports.loginAdmin = async (req, res) => {
         return res.status(403).json({ status: "error", message: "Invalid credentials" });
     }
 
-    const token = jwt.sign({ email, role: "admin" }, SECRET_KEY, { expiresIn: "1h" });
+    const token = jwt.sign({ email, role: "admin" }, SECRET_KEY);
 
     return res.json({ status: "success", message: "Login successful", token });
 };
