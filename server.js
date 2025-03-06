@@ -6,12 +6,14 @@ const Razorpay = require("razorpay");
 const shortid = require("shortid");
 const crypto = require("crypto");
 require("dotenv").config();
-const sendEmail = require('./middleware/sendEmail')
+const sendEmail = require('./middleware/sendEmail');
+const verifyAdmin = require('./middleware/verifyAdmin')
 const app = express();
 const {fees} = require('./constants/events')
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
+const adminRouter = require('./routes/admin')
 const nodemailer = require('nodemailer');
 // Connect to MongoDB
 mongoose.connect(process.env.DB_URL, {
@@ -69,8 +71,10 @@ const razorpay = new Razorpay({
 app.use(cors());
 //need to update cors origin
 
+app.use("/admin", adminRouter)
+
 app.get("/", (req, res) => {
-  res.send("Hello World updated referal section");
+  res.send("Hello World");
 });
 
 app.post("/register", async (req, res) => {
