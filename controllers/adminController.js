@@ -28,7 +28,20 @@ exports.loginAdmin = async (req, res) => {
 // Get all users
 exports.getAllUsers = async (req, res) => {
     try {
-        const users = await Tshirt.find({}, "email contact smId size orderId paymentId referral createdAt");
+        const tshirtUsers = await Tshirt.find({}, "email contact smId size orderId paymentId referral createdAt");
+        const userDetailsMap = await User.find({}, "smId name college").then(users => 
+            users.reduce((acc, user) => {
+                acc[user.smId] = { name: user.name, college: user.college };
+                return acc;
+            }, {})
+        );
+        
+        const users = tshirtUsers.map(user => ({
+            ...user.toObject(),
+            name: userDetailsMap[user.smId]?.name || "N/A",
+            college: userDetailsMap[user.smId]?.college || "N/A"
+        }));
+
         res.json({ status: "success", message: "Users retrieved successfully", data: users });
     } catch (err) {
         res.status(500).json({ status: "error", message: "Server Error", data: null });
@@ -38,9 +51,21 @@ exports.getAllUsers = async (req, res) => {
 // Get user by smId
 exports.getUserBySmId = async (req, res) => {
     try {
-        const user = await Tshirt.findOne({ smId: req.params.smId }, "email contact smId size orderId paymentId referral createdAt");
-        if (!user) return res.status(404).json({ status: "error", message: "User not found", data: null });
+        const tshirt = await Tshirt.findOne({ smId: req.params.smId }, "email contact smId size orderId paymentId referral createdAt");
+        if (!tshirt) return res.status(404).json({ status: "error", message: "User not found", data: null });
         
+        const userDetails = await User.findOne(
+            { smId: req.params.smId },
+            "name college"
+        );
+        
+        const user = {
+            ...tshirt.toObject(),
+            name: userDetails?.name || "N/A",
+            college: userDetails?.college || "N/A"
+        };
+        
+
         const events = await Event.find({
             $or: [
                 { smId: req.params.smId },
@@ -48,8 +73,9 @@ exports.getUserBySmId = async (req, res) => {
             ]
         }, "event paid paymentId teammembers createdAt email contact");
 
-        res.json({ status: "success", message: "User details retrieved", data: { ...user.toObject(), events: events.length > 0 ? events : [] } });
+        res.json({ status: "success", message: "User details retrieved", data: { ...user, events: events.length > 0 ? events : [] } });
     } catch (err) {
+        console.error(err)
         res.status(500).json({ status: "error", message: "Server Error", data: null });
     }
 };
