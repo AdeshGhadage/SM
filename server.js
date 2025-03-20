@@ -544,6 +544,11 @@ app.get("/user", async (req, res) => {
 // });
 
 app.post("/orders", async (req, res) => {
+
+  return res.status(400).json({
+    status: "error",
+    message: "Regristrations are closed"
+  })
   
   const { event, teammembers, type, size, token, referral } = req.body;
 
